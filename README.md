@@ -20,9 +20,26 @@ thoth-lite transforms OpenCode into a proactive executive partner that manages y
 | **Grounding** | Claims nothing without file-based evidence |
 | **Brevity** | No fluff. "German understatement." |
 
+---
+
 ## Installation
 
-### 1. Copy the Agent Configuration
+### Quick Start
+
+```bash
+# Clone thoth-lite
+git clone https://github.com/Skeptomenos/thoth-lite.git
+
+# Copy agent config to your knowledge base
+cp thoth-lite/AGENTS.md /path/to/your/kb/AGENTS.md
+
+# Install required skills
+./thoth-lite/install-skills.sh /path/to/your/kb
+```
+
+### Manual Installation
+
+#### 1. Copy Agent Configuration
 
 ```bash
 cp AGENTS.md /path/to/your/project/AGENTS.md
@@ -34,11 +51,36 @@ Or symlink for updates:
 ln -s /path/to/thoth-lite/AGENTS.md ./AGENTS.md
 ```
 
-### 2. Create Knowledge Base Structure
+#### 2. Install Skills
+
+thoth-lite requires skills from [Skeptomenos/skills](https://github.com/Skeptomenos/skills).
+
+```bash
+# Navigate to your knowledge base root
+cd /path/to/your/kb
+
+# Create skills directory and install all skills
+mkdir -p .opencode/skill
+git clone https://github.com/Skeptomenos/skills.git /tmp/skills-repo
+cp -r /tmp/skills-repo/skills/* .opencode/skill/
+rm -rf .opencode/skill/_templates
+rm -rf /tmp/skills-repo
+```
+
+#### 3. Create Knowledge Base Structure
 
 ```
-your-project/
+your-kb/
 ├── AGENTS.md                 # The agent brain
+├── .opencode/
+│   └── skill/                # All skills from Skeptomenos/skills
+│       ├── knowledge-capture/
+│       ├── cross-linker/
+│       ├── gardener/
+│       ├── morning-boot/
+│       ├── mail-triage/
+│       ├── ... (17 skills total)
+│       └── evening-close/
 ├── _index.md                 # Root index
 ├── work/
 │   ├── _index.md
@@ -60,15 +102,92 @@ Every folder needs an `_index.md` file:
 | Project Alpha | projects/project-alpha.md | Active | Q1 API migration |
 ```
 
-### 3. (Optional) Install Skills
+---
 
-If you have access to `thoth-core`, symlink recommended skills:
+## Skills
+
+thoth-lite is powered by skills from [Skeptomenos/skills](https://github.com/Skeptomenos/skills). The install script copies all relevant skills to your knowledge base.
+
+### Knowledge Management (Core)
+
+| Skill | Purpose |
+|-------|---------|
+| **knowledge-capture** | Extract entities (people, projects, decisions) from conversation and persist to structured files |
+| **cross-linker** | Discover and create `[[wikilinks]]` between KB files with evidence-based confidence tiers |
+| **gardener** | Maintain KB health: audit indexes, fix broken links, detect orphans, suggest promotions |
+| **domain-discovery** | Breadth-first interviewing to map new domains before diving deep |
+
+### Daily Operations
+
+| Skill | Purpose |
+|-------|---------|
+| **morning-boot** | Daily briefing orchestrator: parallel scan of email/calendar, synthesize priorities |
+| **evening-close** | Day summary: extract incomplete tasks, persist learnings, prepare tomorrow's overflow |
+| **cal-grid** | Map the daily calendar grid identifying meetings, deep work slots, and prep needs |
+| **mail-triage** | Exhaustively drain inbox, classify messages, detect meeting notes for handoff |
+
+### Communication
+
+| Skill | Purpose |
+|-------|---------|
+| **email-draft** | Draft professional emails and replies via Gmail |
+| **slack-pulse** | Scan Slack for mentions, DMs, and high-value channel activity |
+| **post-meeting-drill** | Deep processing of meeting notes with entity resolution and knowledge persistence |
+
+### Leadership & Hiring
+
+| Skill | Purpose |
+|-------|---------|
+| **leadership-coach** | IC-to-Manager coaching for leadership challenges, 1:1 prep, performance conversations |
+| **interview-prep** | Generate tailored interview questions from job description and resume |
+| **scorecard-synthesis** | Synthesize hiring scorecards from interview transcripts with evidence |
+
+### Meta / Tooling
+
+| Skill | Purpose |
+|-------|---------|
+| **agents-md** | Audit and improve AGENTS.md files using progressive disclosure principles |
+| **skill-generator** | Create new skills using TDD methodology for process documentation |
+| **open-prose** | Run OpenProse programs for multi-agent orchestration |
+
+### Skill Pipelines
+
+```
+domain-discovery → knowledge-capture → cross-linker → gardener
+   (interview)        (persist)         (connect)     (maintain)
+```
+
+```
+morning-boot ─────────────────────────────────────→ evening-close
+  (start day)                                         (close day)
+       │                                                   │
+       ├── mail-triage                                     │
+       ├── cal-grid                                        │
+       └── slack-pulse                                     │
+                                                           │
+              post-meeting-drill ──────────────────────────┘
+```
+
+---
+
+## Updating Skills
+
+Run the install script again to update all skills:
 
 ```bash
+./install-skills.sh /path/to/your/kb
+```
+
+Or manually:
+
+```bash
+cd /path/to/your/kb
+rm -rf .opencode/skill
+git clone https://github.com/Skeptomenos/skills.git /tmp/skills-repo
 mkdir -p .opencode/skill
-cd .opencode/skill
-ln -s /path/to/thoth-core/defaults/skill/morning-boot morning-boot
-ln -s /path/to/thoth-core/defaults/skill/context-discovery context-discovery
+cp -r /tmp/skills-repo/skills/* .opencode/skill/
+rm -rf .opencode/skill/_templates
+rm -rf /tmp/skills-repo
 ```
 
 ## Protocols
